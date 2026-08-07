@@ -1,0 +1,793 @@
+{
+  "info": {
+    "_postman_id": "sms-backend-collection-2026",
+    "name": "Student Management System — Complete API",
+    "description": "Complete Postman collection for the Student Management System REST API.\n\nBase URL: http://localhost:5000/api\n\nCredentials (after running seed.js):\n- Admin:   admin@sms.edu / Admin@123\n- Teacher: r.sharma@sms.edu / Teacher@123\n- Student: aarav.singh@student.sms.edu / Student@123\n\nWorkflow:\n1. Run 'Auth > Login (Admin)' first\n2. Copy the token from response → paste into collection variable 'adminToken'\n3. Use the role-specific tokens for teacher/student endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl",      "value": "http://localhost:5000", "type": "string" },
+    { "key": "adminToken",   "value": "",                    "type": "string" },
+    { "key": "teacherToken", "value": "",                    "type": "string" },
+    { "key": "studentToken", "value": "",                    "type": "string" },
+    { "key": "studentId",    "value": "1",                   "type": "string" },
+    { "key": "teacherId",    "value": "1",                   "type": "string" },
+    { "key": "courseId",     "value": "1",                   "type": "string" },
+    { "key": "attendanceId", "value": "1",                   "type": "string" },
+    { "key": "markId",       "value": "1",                   "type": "string" },
+    { "key": "feeId",        "value": "1",                   "type": "string" },
+    { "key": "annoId",       "value": "1",                   "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "🏥 Health Check",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Register (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Admin User\",\n  \"email\": \"newadmin@sms.edu\",\n  \"password\": \"Admin@123\",\n  \"role\": \"admin\",\n  \"phone\": \"+919876543000\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('adminToken', body.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register (Teacher)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Teacher\",\n  \"email\": \"newteacher@sms.edu\",\n  \"password\": \"Teacher@123\",\n  \"role\": \"teacher\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] }
+          }
+        },
+        {
+          "name": "Register (Student)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Student\",\n  \"email\": \"newstudent@sms.edu\",\n  \"password\": \"Student@123\",\n  \"role\": \"student\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] }
+          }
+        },
+        {
+          "name": "Login (Admin) ⭐",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@sms.edu\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('adminToken', body.data.token);",
+                  "  console.log('Admin token saved');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login (Teacher) ⭐",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"r.sharma@sms.edu\",\n  \"password\": \"Teacher@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('teacherToken', body.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login (Student) ⭐",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"aarav.singh@student.sms.edu\",\n  \"password\": \"Student@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('studentToken', body.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/profile", "host": ["{{baseUrl}}"], "path": ["api","auth","profile"] }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dr. Admin Updated\",\n  \"phone\": \"+919876543211\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/profile", "host": ["{{baseUrl}}"], "path": ["api","auth","profile"] }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/logout", "host": ["{{baseUrl}}"], "path": ["api","auth","logout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 Users (Admin Only)",
+      "item": [
+        {
+          "name": "GET All Users",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/users?page=1&limit=10",
+              "host": ["{{baseUrl}}"], "path": ["api","users"],
+              "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "10"}]
+            }
+          }
+        },
+        {
+          "name": "GET Users by Role",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/users?role=student",
+              "host": ["{{baseUrl}}"], "path": ["api","users"],
+              "query": [{"key": "role", "value": "student"}]
+            }
+          }
+        },
+        {
+          "name": "GET User by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/users/1", "host": ["{{baseUrl}}"], "path": ["api","users","1"] }
+          }
+        },
+        {
+          "name": "DELETE User by ID",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/users/99", "host": ["{{baseUrl}}"], "path": ["api","users","99"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👩‍🏫 Teachers",
+      "item": [
+        {
+          "name": "POST Create Teacher Profile (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 2,\n  \"employee_id\": \"EMP100\",\n  \"department\": \"Computer Science\",\n  \"designation\": \"Lecturer\",\n  \"qualification\": \"M.Tech\",\n  \"experience\": 3\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/teachers", "host": ["{{baseUrl}}"], "path": ["api","teachers"] }
+          }
+        },
+        {
+          "name": "GET All Teachers (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/teachers?page=1&limit=10", "host": ["{{baseUrl}}"], "path": ["api","teachers"] }
+          }
+        },
+        {
+          "name": "GET My Profile (Teacher)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacherToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/teachers/my-profile", "host": ["{{baseUrl}}"], "path": ["api","teachers","my-profile"] }
+          }
+        },
+        {
+          "name": "GET Teacher by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/teachers/{{teacherId}}", "host": ["{{baseUrl}}"], "path": ["api","teachers","{{teacherId}}"] }
+          }
+        },
+        {
+          "name": "PUT Update Teacher (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"designation\": \"Associate Professor\",\n  \"experience\": 15\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/teachers/{{teacherId}}", "host": ["{{baseUrl}}"], "path": ["api","teachers","{{teacherId}}"] }
+          }
+        },
+        {
+          "name": "PUT Approve Teacher (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/teachers/{{teacherId}}/approve", "host": ["{{baseUrl}}"], "path": ["api","teachers","{{teacherId}}","approve"] }
+          }
+        },
+        {
+          "name": "DELETE Teacher (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/teachers/{{teacherId}}", "host": ["{{baseUrl}}"], "path": ["api","teachers","{{teacherId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎓 Students",
+      "item": [
+        {
+          "name": "POST Create Student Profile (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 5,\n  \"roll_number\": \"CS2024099\",\n  \"department\": \"Computer Science\",\n  \"semester\": 4,\n  \"year\": 2024,\n  \"gender\": \"male\",\n  \"dob\": \"2003-06-15\",\n  \"address\": \"123 Main Street, Mumbai\",\n  \"guardian_name\": \"Parent Name\",\n  \"guardian_phone\": \"+919812345678\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/students", "host": ["{{baseUrl}}"], "path": ["api","students"] }
+          }
+        },
+        {
+          "name": "GET All Students (Admin/Teacher)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/students?page=1&limit=10",
+              "host": ["{{baseUrl}}"], "path": ["api","students"],
+              "query": [{"key": "page","value": "1"},{"key": "limit","value": "10"}]
+            }
+          }
+        },
+        {
+          "name": "GET Students by Department",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/students?department=Computer Science&semester=4",
+              "host": ["{{baseUrl}}"], "path": ["api","students"],
+              "query": [{"key":"department","value":"Computer Science"},{"key":"semester","value":"4"}]
+            }
+          }
+        },
+        {
+          "name": "GET My Profile (Student)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/students/my-profile", "host": ["{{baseUrl}}"], "path": ["api","students","my-profile"] }
+          }
+        },
+        {
+          "name": "GET Student by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/students/{{studentId}}", "host": ["{{baseUrl}}"], "path": ["api","students","{{studentId}}"] }
+          }
+        },
+        {
+          "name": "PUT Update Student (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"semester\": 5,\n  \"status\": \"active\",\n  \"address\": \"456 New Address, Delhi\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/students/{{studentId}}", "host": ["{{baseUrl}}"], "path": ["api","students","{{studentId}}"] }
+          }
+        },
+        {
+          "name": "DELETE Student (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/students/{{studentId}}", "host": ["{{baseUrl}}"], "path": ["api","students","{{studentId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📚 Courses",
+      "item": [
+        {
+          "name": "POST Create Course (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course_name\": \"Web Development\",\n  \"course_code\": \"CS401\",\n  \"semester\": 5,\n  \"department\": \"Computer Science\",\n  \"credits\": 4,\n  \"teacher_id\": 1\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/courses", "host": ["{{baseUrl}}"], "path": ["api","courses"] }
+          }
+        },
+        {
+          "name": "GET All Courses",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/courses", "host": ["{{baseUrl}}"], "path": ["api","courses"] }
+          }
+        },
+        {
+          "name": "GET Courses (Teacher — own only)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacherToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/courses", "host": ["{{baseUrl}}"], "path": ["api","courses"] }
+          }
+        },
+        {
+          "name": "GET Course by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/courses/{{courseId}}", "host": ["{{baseUrl}}"], "path": ["api","courses","{{courseId}}"] }
+          }
+        },
+        {
+          "name": "PUT Update Course (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course_name\": \"Advanced Data Structures\",\n  \"credits\": 4\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/courses/{{courseId}}", "host": ["{{baseUrl}}"], "path": ["api","courses","{{courseId}}"] }
+          }
+        },
+        {
+          "name": "PUT Assign Teacher to Course",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"teacher_id\": 1\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/courses/{{courseId}}/assign-teacher", "host": ["{{baseUrl}}"], "path": ["api","courses","{{courseId}}","assign-teacher"] }
+          }
+        },
+        {
+          "name": "DELETE Course (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/courses/{{courseId}}", "host": ["{{baseUrl}}"], "path": ["api","courses","{{courseId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📋 Attendance",
+      "item": [
+        {
+          "name": "POST Record Single Attendance",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": 1,\n  \"course_id\": 1,\n  \"date\": \"2026-08-06\",\n  \"status\": \"present\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/attendance", "host": ["{{baseUrl}}"], "path": ["api","attendance"] }
+          }
+        },
+        {
+          "name": "POST Bulk Attendance",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course_id\": 1,\n  \"date\": \"2026-08-06\",\n  \"records\": [\n    { \"student_id\": 1, \"status\": \"present\" },\n    { \"student_id\": 2, \"status\": \"absent\" },\n    { \"student_id\": 3, \"status\": \"late\" }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/attendance/bulk", "host": ["{{baseUrl}}"], "path": ["api","attendance","bulk"] }
+          }
+        },
+        {
+          "name": "GET All Attendance (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance?course_id=1&page=1&limit=20",
+              "host": ["{{baseUrl}}"], "path": ["api","attendance"],
+              "query": [{"key":"course_id","value":"1"},{"key":"page","value":"1"},{"key":"limit","value":"20"}]
+            }
+          }
+        },
+        {
+          "name": "GET Attendance (Student — own only)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/attendance", "host": ["{{baseUrl}}"], "path": ["api","attendance"] }
+          }
+        },
+        {
+          "name": "GET Attendance by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/attendance/{{attendanceId}}", "host": ["{{baseUrl}}"], "path": ["api","attendance","{{attendanceId}}"] }
+          }
+        },
+        {
+          "name": "GET Attendance Summary",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/attendance/summary/1/1", "host": ["{{baseUrl}}"], "path": ["api","attendance","summary","1","1"] }
+          }
+        },
+        {
+          "name": "PUT Update Attendance Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"excused\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/attendance/{{attendanceId}}", "host": ["{{baseUrl}}"], "path": ["api","attendance","{{attendanceId}}"] }
+          }
+        },
+        {
+          "name": "DELETE Attendance Record (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/attendance/{{attendanceId}}", "host": ["{{baseUrl}}"], "path": ["api","attendance","{{attendanceId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Marks",
+      "item": [
+        {
+          "name": "POST Add Marks (Admin/Teacher)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": 1,\n  \"course_id\": 1,\n  \"exam_type\": \"midterm\",\n  \"marks\": 42,\n  \"total_marks\": 50\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/marks", "host": ["{{baseUrl}}"], "path": ["api","marks"] }
+          }
+        },
+        {
+          "name": "GET All Marks (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/marks?course_id=1", "host": ["{{baseUrl}}"], "path": ["api","marks"] }
+          }
+        },
+        {
+          "name": "GET Marks (Student — own only)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/marks", "host": ["{{baseUrl}}"], "path": ["api","marks"] }
+          }
+        },
+        {
+          "name": "GET Marks by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/marks/{{markId}}", "host": ["{{baseUrl}}"], "path": ["api","marks","{{markId}}"] }
+          }
+        },
+        {
+          "name": "GET Student Marks Report",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/marks/report/{{studentId}}", "host": ["{{baseUrl}}"], "path": ["api","marks","report","{{studentId}}"] }
+          }
+        },
+        {
+          "name": "PUT Update Marks",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"marks\": 46,\n  \"total_marks\": 50\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/marks/{{markId}}", "host": ["{{baseUrl}}"], "path": ["api","marks","{{markId}}"] }
+          }
+        },
+        {
+          "name": "DELETE Marks (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/marks/{{markId}}", "host": ["{{baseUrl}}"], "path": ["api","marks","{{markId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💰 Fees",
+      "item": [
+        {
+          "name": "POST Create Fee (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": 1,\n  \"amount\": 25000,\n  \"status\": \"pending\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/fees", "host": ["{{baseUrl}}"], "path": ["api","fees"] }
+          }
+        },
+        {
+          "name": "GET All Fees (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/fees?status=pending",
+              "host": ["{{baseUrl}}"], "path": ["api","fees"],
+              "query": [{"key":"status","value":"pending"}]
+            }
+          }
+        },
+        {
+          "name": "GET Fees (Student — own only)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/fees", "host": ["{{baseUrl}}"], "path": ["api","fees"] }
+          }
+        },
+        {
+          "name": "GET Fee by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/fees/{{feeId}}", "host": ["{{baseUrl}}"], "path": ["api","fees","{{feeId}}"] }
+          }
+        },
+        {
+          "name": "GET Fee Summary",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/fees/summary/{{studentId}}", "host": ["{{baseUrl}}"], "path": ["api","fees","summary","{{studentId}}"] }
+          }
+        },
+        {
+          "name": "PUT Mark Fee as Paid",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"paid\",\n  \"payment_date\": \"2026-08-06\",\n  \"payment_method\": \"online\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/fees/{{feeId}}", "host": ["{{baseUrl}}"], "path": ["api","fees","{{feeId}}"] }
+          }
+        },
+        {
+          "name": "DELETE Fee (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/fees/{{feeId}}", "host": ["{{baseUrl}}"], "path": ["api","fees","{{feeId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📢 Announcements",
+      "item": [
+        {
+          "name": "POST Create Announcement (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Important Notice for All Students\",\n  \"description\": \"All students are required to update their contact information in the student portal by the end of this week. Please log in and verify your details.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/announcements", "host": ["{{baseUrl}}"], "path": ["api","announcements"] }
+          }
+        },
+        {
+          "name": "GET All Announcements",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/announcements?page=1&limit=10",
+              "host": ["{{baseUrl}}"], "path": ["api","announcements"],
+              "query": [{"key":"page","value":"1"},{"key":"limit","value":"10"}]
+            }
+          }
+        },
+        {
+          "name": "GET Announcement by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/announcements/{{annoId}}", "host": ["{{baseUrl}}"], "path": ["api","announcements","{{annoId}}"] }
+          }
+        },
+        {
+          "name": "PUT Update Announcement (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated: Important Notice for All Students\",\n  \"description\": \"UPDATED: All students are required to update their contact information by Friday end of day.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/announcements/{{annoId}}", "host": ["{{baseUrl}}"], "path": ["api","announcements","{{annoId}}"] }
+          }
+        },
+        {
+          "name": "DELETE Announcement (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/announcements/{{annoId}}", "host": ["{{baseUrl}}"], "path": ["api","announcements","{{annoId}}"] }
+          }
+        }
+      ]
+    }
+  ]
+}

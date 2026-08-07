@@ -1,0 +1,400 @@
+{
+  "summary": {
+    "total": 77,
+    "passed": 77,
+    "failed": 0,
+    "errors": 0,
+    "passRate": "100%",
+    "duration": "3.03s",
+    "timestamp": "2026-08-06T15:34:28.926Z"
+  },
+  "passed": [
+    {
+      "id": 1,
+      "name": "GET /health — server is alive",
+      "status": 200
+    },
+    {
+      "id": 2,
+      "name": "POST /api/auth/register — new admin user",
+      "status": 201
+    },
+    {
+      "id": 3,
+      "name": "POST /api/auth/login — admin login",
+      "status": 200
+    },
+    {
+      "id": 4,
+      "name": "POST /api/auth/login — teacher login",
+      "status": 200
+    },
+    {
+      "id": 5,
+      "name": "POST /api/auth/login — student login",
+      "status": 200
+    },
+    {
+      "id": 6,
+      "name": "POST /api/auth/login — wrong password → 401",
+      "status": 401
+    },
+    {
+      "id": 7,
+      "name": "POST /api/auth/login — missing email → 422",
+      "status": 422
+    },
+    {
+      "id": 8,
+      "name": "POST /api/auth/register — duplicate email → 409",
+      "status": 409
+    },
+    {
+      "id": 9,
+      "name": "GET /api/auth/profile — with valid token",
+      "status": 200
+    },
+    {
+      "id": 10,
+      "name": "GET /api/auth/profile — without token → 401",
+      "status": 401
+    },
+    {
+      "id": 11,
+      "name": "GET /api/auth/profile — invalid token → 401",
+      "status": 401
+    },
+    {
+      "id": 12,
+      "name": "POST /api/auth/logout — valid token",
+      "status": 200
+    },
+    {
+      "id": 13,
+      "name": "GET /api/users — admin gets all users",
+      "status": 200
+    },
+    {
+      "id": 14,
+      "name": "GET /api/users?role=student — filter by role",
+      "status": 200
+    },
+    {
+      "id": 15,
+      "name": "GET /api/users — teacher forbidden → 403",
+      "status": 403
+    },
+    {
+      "id": 16,
+      "name": "GET /api/users/:id — admin gets user by ID",
+      "status": 200
+    },
+    {
+      "id": 17,
+      "name": "GET /api/users/999999 — not found → 404",
+      "status": 404
+    },
+    {
+      "id": 18,
+      "name": "GET /api/users/abc — invalid ID → 422",
+      "status": 422
+    },
+    {
+      "id": 19,
+      "name": "GET /api/teachers — admin gets all teachers",
+      "status": 200
+    },
+    {
+      "id": 20,
+      "name": "GET /api/teachers/my-profile — teacher gets own profile",
+      "status": 200
+    },
+    {
+      "id": 21,
+      "name": "GET /api/teachers/:id — admin gets teacher by ID",
+      "status": 200
+    },
+    {
+      "id": 22,
+      "name": "GET /api/teachers/999999 — not found → 404",
+      "status": 404
+    },
+    {
+      "id": 23,
+      "name": "PUT /api/teachers/:id — admin updates teacher",
+      "status": 200
+    },
+    {
+      "id": 24,
+      "name": "PUT /api/teachers/:id/approve — admin approves teacher",
+      "status": 200
+    },
+    {
+      "id": 25,
+      "name": "GET /api/teachers — student forbidden → 403",
+      "status": 403
+    },
+    {
+      "id": 26,
+      "name": "GET /api/students — admin gets all students",
+      "status": 200
+    },
+    {
+      "id": 27,
+      "name": "GET /api/students?department=Computer Science — filter",
+      "status": 200
+    },
+    {
+      "id": 28,
+      "name": "GET /api/students/my-profile — student gets own profile",
+      "status": 200
+    },
+    {
+      "id": 29,
+      "name": "GET /api/students/:id — admin gets student by ID",
+      "status": 200
+    },
+    {
+      "id": 30,
+      "name": "PUT /api/students/:id — admin updates student",
+      "status": 200
+    },
+    {
+      "id": 31,
+      "name": "GET /api/students/999999 — not found → 404",
+      "status": 404
+    },
+    {
+      "id": 32,
+      "name": "POST /api/courses — admin creates course",
+      "status": 201
+    },
+    {
+      "id": 33,
+      "name": "GET /api/courses — admin gets all courses",
+      "status": 200
+    },
+    {
+      "id": 34,
+      "name": "GET /api/courses — teacher gets own courses",
+      "status": 200
+    },
+    {
+      "id": 35,
+      "name": "GET /api/courses — student gets all courses",
+      "status": 200
+    },
+    {
+      "id": 36,
+      "name": "GET /api/courses/:id — admin gets course by ID",
+      "status": 200
+    },
+    {
+      "id": 37,
+      "name": "PUT /api/courses/:id — admin updates course",
+      "status": 200
+    },
+    {
+      "id": 38,
+      "name": "PUT /api/courses/:id/assign-teacher — assign teacher",
+      "status": 200
+    },
+    {
+      "id": 39,
+      "name": "POST /api/courses — missing fields → 422",
+      "status": 422
+    },
+    {
+      "id": 40,
+      "name": "DELETE /api/courses/:id — admin deletes course",
+      "status": 204
+    },
+    {
+      "id": 41,
+      "name": "POST /api/attendance — admin records attendance",
+      "status": 201
+    },
+    {
+      "id": 42,
+      "name": "GET /api/attendance — admin gets all attendance",
+      "status": 200
+    },
+    {
+      "id": 43,
+      "name": "GET /api/attendance — student gets own attendance",
+      "status": 200
+    },
+    {
+      "id": 44,
+      "name": "GET /api/attendance/:id — get by ID",
+      "status": 200
+    },
+    {
+      "id": 45,
+      "name": "GET /api/attendance/summary/:studentId/:courseId",
+      "status": 200
+    },
+    {
+      "id": 46,
+      "name": "PUT /api/attendance/:id — update status",
+      "status": 200
+    },
+    {
+      "id": 47,
+      "name": "POST /api/attendance/bulk — bulk attendance",
+      "status": 201
+    },
+    {
+      "id": 48,
+      "name": "DELETE /api/attendance/:id — admin deletes record",
+      "status": 204
+    },
+    {
+      "id": 49,
+      "name": "POST /api/marks — admin adds marks",
+      "status": 201
+    },
+    {
+      "id": 50,
+      "name": "GET /api/marks — admin gets all marks",
+      "status": 200
+    },
+    {
+      "id": 51,
+      "name": "GET /api/marks — student gets own marks",
+      "status": 200
+    },
+    {
+      "id": 52,
+      "name": "GET /api/marks/:id — get mark by ID",
+      "status": 200
+    },
+    {
+      "id": 53,
+      "name": "GET /api/marks/report/:studentId — marks report",
+      "status": 200
+    },
+    {
+      "id": 54,
+      "name": "PUT /api/marks/:id — update marks",
+      "status": 200
+    },
+    {
+      "id": 55,
+      "name": "POST /api/marks — marks > total → 422",
+      "status": 422
+    },
+    {
+      "id": 56,
+      "name": "DELETE /api/marks/:id — admin deletes mark",
+      "status": 204
+    },
+    {
+      "id": 57,
+      "name": "POST /api/fees — admin creates fee",
+      "status": 201
+    },
+    {
+      "id": 58,
+      "name": "GET /api/fees — admin gets all fees",
+      "status": 200
+    },
+    {
+      "id": 59,
+      "name": "GET /api/fees — student gets own fees",
+      "status": 200
+    },
+    {
+      "id": 60,
+      "name": "GET /api/fees/:id — get fee by ID",
+      "status": 200
+    },
+    {
+      "id": 61,
+      "name": "GET /api/fees/summary/:studentId — fee summary",
+      "status": 200
+    },
+    {
+      "id": 62,
+      "name": "PUT /api/fees/:id — mark as paid",
+      "status": 200
+    },
+    {
+      "id": 63,
+      "name": "POST /api/fees — teacher forbidden → 403",
+      "status": 403
+    },
+    {
+      "id": 64,
+      "name": "DELETE /api/fees/:id — admin deletes fee",
+      "status": 204
+    },
+    {
+      "id": 65,
+      "name": "POST /api/announcements — admin creates announcement",
+      "status": 201
+    },
+    {
+      "id": 66,
+      "name": "GET /api/announcements — admin gets all",
+      "status": 200
+    },
+    {
+      "id": 67,
+      "name": "GET /api/announcements — teacher gets all",
+      "status": 200
+    },
+    {
+      "id": 68,
+      "name": "GET /api/announcements — student gets all",
+      "status": 200
+    },
+    {
+      "id": 69,
+      "name": "GET /api/announcements/:id — get by ID",
+      "status": 200
+    },
+    {
+      "id": 70,
+      "name": "PUT /api/announcements/:id — admin updates",
+      "status": 200
+    },
+    {
+      "id": 71,
+      "name": "POST /api/announcements — teacher forbidden → 403",
+      "status": 403
+    },
+    {
+      "id": 72,
+      "name": "DELETE /api/announcements/:id — admin deletes",
+      "status": 204
+    },
+    {
+      "id": 73,
+      "name": "Protected route — no token → 401",
+      "status": 401
+    },
+    {
+      "id": 74,
+      "name": "Protected route — malformed token → 401",
+      "status": 401
+    },
+    {
+      "id": 75,
+      "name": "Admin-only route — student token → 403",
+      "status": 403
+    },
+    {
+      "id": 76,
+      "name": "Student-only route — admin token → 403",
+      "status": 403
+    },
+    {
+      "id": 77,
+      "name": "404 handler — unknown route",
+      "status": 404
+    }
+  ],
+  "failed": [],
+  "errors": []
+}
