@@ -39,6 +39,13 @@ router.get('/my-profile', verifyToken, authorize('student'), getMyStudentProfile
 router.get('/:id', verifyToken, authorize('admin', 'teacher', 'student'), studentIdValidator, getStudentById);
 
 /**
+ * @route   GET /api/students/:id/subjects
+ * @desc    Get assigned subjects for student
+ * @access  Admin, Teacher, Student (own only)
+ */
+router.get('/:id/subjects', verifyToken, authorize('admin', 'teacher', 'student'), studentIdValidator, require('../controllers/studentController').getAssignedSubjects);
+
+/**
  * @route   PUT /api/students/:id
  * @desc    Update student profile
  * @access  Admin

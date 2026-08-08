@@ -29,8 +29,9 @@ api.interceptors.response.use(
       // Handle Unauthorized token expiration
       if (status === 401) {
         localStorage.removeItem(TOKEN_KEY);
-        // Only redirect if not already on login page
-        if (!window.location.pathname.startsWith('/login')) {
+        const currentPath = window.location.pathname;
+        const isPublicPage = currentPath === '/login' || currentPath === '/register' || currentPath === '/';
+        if (!isPublicPage) {
           window.location.href = '/login';
         }
       }

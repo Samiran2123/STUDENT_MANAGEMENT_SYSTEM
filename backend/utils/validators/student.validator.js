@@ -52,42 +52,42 @@ const createStudentValidator = [
 
 const updateStudentValidator = [
   body('department')
-    .optional()
+    .optional({ checkFalsy: true })
     .trim()
     .isLength({ max: 100 }).withMessage('Department cannot exceed 100 characters'),
 
   body('semester')
-    .optional()
+    .optional({ checkFalsy: true })
     .isInt({ min: 1, max: 10 }).withMessage('Semester must be between 1 and 10'),
 
   body('year')
-    .optional()
+    .optional({ checkFalsy: true })
     .isInt({ min: 2000, max: 2100 }).withMessage('Please provide a valid year'),
 
   body('gender')
-    .optional()
+    .optional({ checkFalsy: true })
     .isIn(['male', 'female', 'other']).withMessage('Gender must be male, female, or other'),
 
   body('dob')
-    .optional()
+    .optional({ checkFalsy: true })
     .isDate().withMessage('Date of birth must be a valid date (YYYY-MM-DD)'),
 
   body('address')
-    .optional()
+    .optional({ checkFalsy: true })
     .trim()
     .isLength({ max: 500 }).withMessage('Address cannot exceed 500 characters'),
 
   body('guardian_name')
-    .optional()
+    .optional({ checkFalsy: true })
     .trim()
     .isLength({ max: 100 }).withMessage('Guardian name cannot exceed 100 characters'),
 
   body('guardian_phone')
-    .optional()
+    .optional({ checkFalsy: true })
     .isMobilePhone().withMessage('Please provide a valid guardian phone number'),
 
   body('status')
-    .optional()
+    .optional({ checkFalsy: true })
     .isIn(['active', 'inactive', 'suspended']).withMessage('Status must be active, inactive, or suspended'),
 ];
 

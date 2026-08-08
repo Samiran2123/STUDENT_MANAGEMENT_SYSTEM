@@ -1,7 +1,9 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
+import PublicRoute from './PublicRoute';
 import { ROLES } from '../utils/constants';
+import { useAuth } from '../hooks/useAuth';
 
 // Layouts
 import AdminLayout from '../layouts/AdminLayout';
@@ -23,6 +25,14 @@ import MarksPage from '../pages/admin/MarksPage';
 import FeesPage from '../pages/admin/FeesPage';
 import AnnouncementsPage from '../pages/admin/AnnouncementsPage';
 import UsersPage from '../pages/admin/UsersPage';
+import AdminAdmissionsPage from '../pages/admin/AdminAdmissionsPage';
+import AdminClassesPage from '../pages/admin/AdminClassesPage';
+import AdminSectionsPage from '../pages/admin/AdminSectionsPage';
+import AdminSubjectsPage from '../pages/admin/AdminSubjectsPage';
+import AdminAcademicYearsPage from '../pages/admin/AdminAcademicYearsPage';
+import AdminFeeStructuresPage from '../pages/admin/AdminFeeStructuresPage';
+import AdminFeeLedgerPage from '../pages/admin/AdminFeeLedgerPage';
+import AdminPaymentsPage from '../pages/admin/AdminPaymentsPage';
 
 // Teacher Sub-Pages
 import TeacherDashboard from '../pages/teacher/TeacherDashboard';
@@ -45,13 +55,25 @@ import StudentNotificationsPage from '../pages/student/StudentNotificationsPage'
 import ProfilePage from '../pages/shared/ProfilePage';
 import NotFoundPage from '../pages/NotFoundPage';
 
+const ProfileLayoutWrapper = () => {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role === ROLES.ADMIN) return <AdminLayout />;
+  if (user.role === ROLES.TEACHER) return <TeacherLayout />;
+  if (user.role === ROLES.STUDENT) return <StudentLayout />;
+  return <Navigate to="/login" replace />;
+};
+
 const AppRouter = () => {
   return (
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      
+      <Route element={<PublicRoute />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+      </Route>
 
       {/* Protected Admin Routes */}
       <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}>
@@ -65,6 +87,16 @@ const AppRouter = () => {
           <Route path="fees" element={<FeesPage />} />
           <Route path="announcements" element={<AnnouncementsPage />} />
           <Route path="users" element={<UsersPage />} />
+          
+          {/* New ERP Modules */}
+          <Route path="admissions" element={<AdminAdmissionsPage />} />
+          <Route path="classes" element={<AdminClassesPage />} />
+          <Route path="sections" element={<AdminSectionsPage />} />
+          <Route path="subjects" element={<AdminSubjectsPage />} />
+          <Route path="academic-years" element={<AdminAcademicYearsPage />} />
+          <Route path="fee-structures" element={<AdminFeeStructuresPage />} />
+          <Route path="fee-ledger" element={<AdminFeeLedgerPage />} />
+          <Route path="payments" element={<AdminPaymentsPage />} />
         </Route>
       </Route>
 
@@ -95,7 +127,7 @@ const AppRouter = () => {
 
       {/* Shared Protected Profile Route */}
       <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT]} />}>
-        <Route path="/profile" element={<AdminLayout />}>
+        <Route path="/profile" element={<ProfileLayoutWrapper />}>
           <Route index element={<ProfilePage />} />
         </Route>
       </Route>

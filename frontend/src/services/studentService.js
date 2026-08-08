@@ -25,4 +25,9 @@ export const studentService = {
     const response = await api.delete(`/students/${id}`);
     return response.data;
   },
+
+  getSubjects: async (id) => {
+    const response = await api.get(`/students/${id}/subjects`);
+    return response.data;
+  }
 };

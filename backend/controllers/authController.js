@@ -27,6 +27,7 @@ const register = asyncHandler(async (req, res) => {
   }
 
   const { name, email, password, phone, role } = req.body;
+  const userRole = role || 'student';
 
   // Check if email already exists
   const emailExists = await UserModel.emailExists(email);
@@ -39,9 +40,33 @@ const register = asyncHandler(async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, saltRounds);
 
   // Create user
-  const user = await UserModel.create({ name, email, password: hashedPassword, phone, role });
+  const user = await UserModel.create({ name, email, password: hashedPassword, phone, role: userRole });
 
-  // Generate token
+  if (userRole === 'student') {
+    const StudentModel = require('../models/studentModel');
+    await StudentModel.create({
+      user_id: user.id,
+      degree: req.body.degree || null,
+      department: req.body.department || null,
+      academic_year_id: req.body.academic_year_id ? parseInt(req.body.academic_year_id) : null,
+      class_id: req.body.class_id ? parseInt(req.body.class_id) : null,
+      semester: req.body.semester ? parseInt(req.body.semester) : 1,
+      section_id: req.body.section_id ? parseInt(req.body.section_id) : null,
+      admission_status: 'pending',
+      status: 'inactive',
+    });
+
+    return createdResponse(res, 'Registration successful. Your admission application is pending admin approval.', {
+      user: { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role },
+      token: null,
+    });
+  } else if (userRole === 'teacher') {
+    const TeacherModel = require('../models/teacherModel');
+    const employee_id = `EMP-${user.id}-${Date.now()}`;
+    await TeacherModel.create({ user_id: user.id, employee_id, department: req.body.department || 'General' });
+  }
+
+  // Generate token for non-students (admin/teacher)
   const token = generateToken(user);
 
   return createdResponse(res, 'Account created successfully.', {
@@ -72,6 +97,19 @@ const login = asyncHandler(async (req, res) => {
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
     return errorResponse(res, 401, 'Invalid email or password.');
+  }
+
+  // Check admission status for students
+  if (user.role === 'student') {
+    const StudentModel = require('../models/studentModel');
+    const studentProfile = await StudentModel.findByUserId(user.id);
+    
+    if (!studentProfile || studentProfile.admission_status === 'rejected') {
+      return errorResponse(res, 403, 'Your admission has been rejected.');
+    }
+    if (studentProfile.admission_status !== 'approved') {
+      return errorResponse(res, 403, 'Your admission is pending admin approval.');
+    }
   }
 
   // Generate token

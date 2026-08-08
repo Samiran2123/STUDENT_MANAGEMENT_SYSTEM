@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FiAward } from 'react-icons/fi';
 import { marksService } from '../../services/marksService';
 import Pagination from '../../components/common/Pagination';
@@ -15,7 +15,7 @@ const StudentMarksPage = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const fetchMarks = async () => {
+  const fetchMarks = useCallback(async () => {
     setLoading(true);
     try {
       const res = await marksService.getAll({
@@ -29,16 +29,16 @@ const StudentMarksPage = () => {
           setTotalPages(res.pagination.totalPages || 1);
         }
       }
-    } catch (err) {
+    } catch {
       showToast.error('Failed to load marks report card');
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, selectedExamType]); // Memoized via useCallback
 
   useEffect(() => {
     fetchMarks();
-  }, [page, selectedExamType]);
+  }, [fetchMarks]);
 
   let totalScore = 0;
   let totalMax = 0;

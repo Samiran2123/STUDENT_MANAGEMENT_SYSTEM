@@ -27,6 +27,8 @@ const StudentDashboard = () => {
     fetchStudentData();
   }, []);
 
+  const [subjectsList, setSubjectsList] = useState([]);
+
   const fetchStudentData = async () => {
     setLoading(true);
     try {
@@ -43,6 +45,11 @@ const StudentDashboard = () => {
       setMarksList(mRes.data || []);
       setFeesList(fRes.data || []);
       setAnnouncements(annRes.data || []);
+
+      if (pRes.data && pRes.data.id) {
+        const subRes = await studentService.getSubjects(pRes.data.id);
+        setSubjectsList(subRes.data || []);
+      }
     } catch (err) {
       console.error('Student dashboard load error:', err);
     } finally {
@@ -91,17 +98,17 @@ const StudentDashboard = () => {
         }}
       >
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.5rem' }}>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Student Portal</h1>
-            <StatusBadge status="student" />
-          </div>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-            Welcome, <strong style={{ color: 'var(--text-main)' }}>{user?.name || 'Student'}</strong>
-            {studentProfile && ` • Roll: ${studentProfile.roll_number} (${studentProfile.department}, Sem ${studentProfile.semester})`}
-          </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.5rem' }}>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Student Portal</h1>
+          <StatusBadge status="student" />
         </div>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+          Welcome, <strong style={{ color: 'var(--text-main)' }}>{user?.name || 'Student'}</strong>
+          {studentProfile && ` • Roll: ${studentProfile.roll_number || 'N/A'} (Class: ${studentProfile.class_name || studentProfile.department || 'N/A'})`}
+        </p>
+      </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
+      <div style={{ display: 'flex', gap: '0.75rem' }}>
           <Link
             to="/profile"
             className="glass-panel glass-panel-hover"
@@ -237,6 +244,28 @@ const StudentDashboard = () => {
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '6px' }}>{formatDate(ann.created_at)}</div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Subjects List */}
+        <div className="glass-panel" style={{ padding: '1.75rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <FiBookOpen style={{ color: 'var(--primary)' }} /> Assigned Subjects
+            </h3>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+            {subjectsList.length === 0 ? (
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No subjects assigned yet.</p>
+            ) : (
+              subjectsList.map((sub) => (
+                <div key={sub.id} style={{ padding: '0.85rem', borderRadius: 'var(--radius-md)', backgroundColor: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-glass)' }}>
+                  <div style={{ fontWeight: 600, color: '#fff', fontSize: '0.9rem' }}>{sub.name}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Code: {sub.code}</div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

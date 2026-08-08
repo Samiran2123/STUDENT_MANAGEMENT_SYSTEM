@@ -118,12 +118,13 @@ const FeesPage = () => {
 
   const handleEditClick = (fee) => {
     setSelectedFee(fee);
-    setFormData({
+    setFormData((prev) => ({
+      ...prev,
       amount: fee.amount,
       status: fee.status,
       payment_date: fee.payment_date ? fee.payment_date.split('T')[0] : '',
       payment_method: fee.payment_method || 'online',
-    });
+    }));
     setEditModalOpen(true);
   };
 

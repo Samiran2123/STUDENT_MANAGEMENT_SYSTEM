@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { 
   FiGrid, FiUsers, FiBookOpen, FiUserCheck, FiCheckSquare, 
-  FiAward, FiDollarSign, FiVolume2, FiShield, FiUser 
+  FiAward, FiDollarSign, FiVolume2, FiShield, FiUser,
+  FiFileText, FiLayers, FiList, FiClock, FiFilePlus, FiBriefcase
 } from 'react-icons/fi';
 import Navbar from '../components/common/Navbar';
 import Sidebar from '../components/common/Sidebar';
@@ -21,6 +22,14 @@ const AdminLayout = () => {
     { path: '/admin/fees', label: 'Fee Management', icon: <FiDollarSign /> },
     { path: '/admin/announcements', label: 'Announcements', icon: <FiVolume2 /> },
     { path: '/admin/users', label: 'User Accounts', icon: <FiShield /> },
+    { path: '/admin/admissions', label: 'Admissions (ERP)', icon: <FiFilePlus /> },
+    { path: '/admin/classes', label: 'Classes (ERP)', icon: <FiLayers /> },
+    { path: '/admin/sections', label: 'Sections (ERP)', icon: <FiList /> },
+    { path: '/admin/subjects', label: 'Subjects (ERP)', icon: <FiBookOpen /> },
+    { path: '/admin/academic-years', label: 'Academic Years', icon: <FiClock /> },
+    { path: '/admin/fee-structures', label: 'Fee Structures', icon: <FiBriefcase /> },
+    { path: '/admin/fee-ledger', label: 'Student Ledger', icon: <FiFileText /> },
+    { path: '/admin/payments', label: 'Payments', icon: <FiDollarSign /> },
     { path: '/profile', label: 'My Profile', icon: <FiUser /> },
   ];
 

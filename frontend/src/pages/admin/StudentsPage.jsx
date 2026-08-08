@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FiPlus, FiEdit, FiTrash2, FiSearch, FiFilter, FiUserCheck, FiBookOpen } from 'react-icons/fi';
 import { studentService } from '../../services/studentService';
 import { userService } from '../../services/userService';
@@ -15,6 +16,7 @@ const DEPARTMENTS = ['Computer Science', 'Mathematics', 'Physics', 'Chemistry', 
 const SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 const StudentsPage = () => {
+  const navigate = useNavigate();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -247,41 +249,71 @@ const StudentsPage = () => {
               {students.map((student) => (
                 <tr key={student.id} style={{ borderBottom: '1px solid var(--border-glass)', transition: 'background 0.2s' }}>
                   <td style={{ padding: '14px 18px', fontWeight: 700, color: 'var(--primary)' }}>
-                    {student.roll_number}
+                    {student.roll_number || 'Not Assigned'}
                   </td>
                   <td style={{ padding: '14px 18px' }}>
                     <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>{student.name || 'N/A'}</div>
                     <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{student.email}</div>
                   </td>
                   <td style={{ padding: '14px 18px', color: 'var(--text-main)' }}>
-                    {student.department}
+                    {student.admission_status === 'pending' ? 'Not Assigned' : (student.degree ? `${student.degree} (${student.department || 'N/A'})` : (student.department || 'N/A'))}
                   </td>
                   <td style={{ padding: '14px 18px', color: 'var(--text-muted)' }}>
-                    Sem {student.semester} ({student.year})
+                    {student.admission_status === 'pending' || !student.semester ? 'Not Assigned' : `Sem ${student.semester} (${student.year || '2026'})`}
                   </td>
                   <td style={{ padding: '14px 18px' }}>
                     <div style={{ fontSize: '0.85rem' }}>{student.guardian_name || 'N/A'}</div>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{student.guardian_phone}</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{student.guardian_phone || ''}</div>
                   </td>
                   <td style={{ padding: '14px 18px' }}>
-                    <StatusBadge status={student.status || 'active'} />
+                    {student.admission_status === 'pending' ? (
+                      <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 800, backgroundColor: 'rgba(234, 179, 8, 0.15)', color: 'var(--warning)' }}>
+                        PENDING ADMISSION
+                      </span>
+                    ) : (
+                      <StatusBadge status={student.status || 'active'} />
+                    )}
                   </td>
                   <td style={{ padding: '14px 18px', textAlign: 'right' }}>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                      <button
-                        onClick={() => handleEditClick(student)}
-                        style={{ padding: '6px', color: 'var(--secondary)', backgroundColor: 'rgba(6, 182, 212, 0.1)', borderRadius: 'var(--radius-sm)' }}
-                        title="Edit Student"
-                      >
-                        <FiEdit />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(student)}
-                        style={{ padding: '6px', color: 'var(--danger)', backgroundColor: 'var(--danger-bg)', borderRadius: 'var(--radius-sm)' }}
-                        title="Delete Student"
-                      >
-                        <FiTrash2 />
-                      </button>
+                      {student.admission_status === 'pending' ? (
+                        <button
+                          onClick={() => navigate('/admin/admissions')}
+                          style={{
+                            padding: '6px 12px',
+                            color: '#ffffff',
+                            backgroundColor: 'var(--primary)',
+                            borderRadius: 'var(--radius-sm)',
+                            fontWeight: 600,
+                            fontSize: '0.8rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            border: 'none',
+                            cursor: 'pointer',
+                          }}
+                          title="Review Pending Admission"
+                        >
+                          <FiUserCheck /> Review Admission
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => handleEditClick(student)}
+                            style={{ padding: '6px', color: 'var(--secondary)', backgroundColor: 'rgba(6, 182, 212, 0.1)', borderRadius: 'var(--radius-sm)', border: 'none', cursor: 'pointer' }}
+                            title="Edit Student"
+                          >
+                            <FiEdit />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(student)}
+                            style={{ padding: '6px', color: 'var(--danger)', backgroundColor: 'var(--danger-bg)', borderRadius: 'var(--radius-sm)', border: 'none', cursor: 'pointer' }}
+                            title="Delete Student"
+                          >
+                            <FiTrash2 />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

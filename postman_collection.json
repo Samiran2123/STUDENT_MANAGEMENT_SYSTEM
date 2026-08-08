@@ -1,0 +1,309 @@
+{
+  "info": {
+    "name": "School ERP API",
+    "description": "Postman Collection for School ERP APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData && jsonData.data && jsonData.data.token) {",
+                  "  pm.collectionVariables.set(\"token\", jsonData.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@sms.edu\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ERP",
+      "item": [
+        {
+          "name": "Get Classes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/erp/classes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "erp",
+                "classes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Academic Years",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/erp/academic-years",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "erp",
+                "academic-years"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Pending Admissions",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/erp/pending-admissions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "erp",
+                "pending-admissions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Approve Admission",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"class_id\": 1,\n  \"section_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/erp/admissions/1/approve",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "erp",
+                "admissions",
+                "1",
+                "approve"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reject Admission",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Incomplete documents\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/erp/admissions/1/reject",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "erp",
+                "admissions",
+                "1",
+                "reject"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Student Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/students/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Fee Structure",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/fees",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "fees"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Assigned Subjects",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/students/1/subjects",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "1",
+                "subjects"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

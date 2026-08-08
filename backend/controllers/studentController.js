@@ -113,6 +113,25 @@ const deleteStudent = asyncHandler(async (req, res) => {
   return noContentResponse(res);
 });
 
+/**
+ * GET /api/students/:id/subjects
+ * Admin/Teacher/Student: Get assigned subjects for a student
+ */
+const getAssignedSubjects = asyncHandler(async (req, res) => {
+  const student = await StudentModel.findById(req.params.id);
+  if (!student) {
+    return errorResponse(res, 404, `Student with ID ${req.params.id} not found.`);
+  }
+
+  // Students can only view their own profile
+  if (req.user.role === 'student' && student.user_id !== req.user.id) {
+    return errorResponse(res, 403, 'You are not authorized to view this student profile.');
+  }
+
+  const subjects = await StudentModel.getAssignedSubjects(req.params.id);
+  return successResponse(res, 200, 'Assigned subjects fetched successfully.', subjects);
+});
+
 module.exports = {
   createStudent,
   getAllStudents,
@@ -120,4 +139,5 @@ module.exports = {
   getMyStudentProfile,
   updateStudent,
   deleteStudent,
+  getAssignedSubjects,
 };

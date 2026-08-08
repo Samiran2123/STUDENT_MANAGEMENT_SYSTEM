@@ -6,18 +6,21 @@ const StudentModel = {
    */
   create: async (data) => {
     const {
-      user_id, roll_number, department, semester, year,
-      gender, dob, address, photo, guardian_name, guardian_phone, status,
+      user_id, roll_number, degree, department, semester, year,
+      academic_year_id, class_id, section_id,
+      gender, dob, address, photo, guardian_name, guardian_phone, status, admission_status
     } = data;
     const sql = `
       INSERT INTO students
-        (user_id, roll_number, department, semester, year, gender, dob, address, photo, guardian_name, guardian_phone, status)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+        (user_id, roll_number, degree, department, semester, year, academic_year_id, class_id, section_id, gender, dob, address, photo, guardian_name, guardian_phone, status, admission_status)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
       RETURNING *
     `;
     const { rows } = await query(sql, [
-      user_id, roll_number, department, semester, year,
-      gender, dob, address, photo, guardian_name, guardian_phone, status || 'active',
+      user_id, roll_number || null, degree || null, department || null,
+      semester || null, year || null, academic_year_id || null, class_id || null, section_id || null,
+      gender || null, dob || null, address || null, photo || null, guardian_name || null, guardian_phone || null,
+      status || 'inactive', admission_status || 'pending',
     ]);
     return rows[0];
   },
@@ -86,9 +89,10 @@ const StudentModel = {
    */
   findByUserId: async (userId) => {
     const sql = `
-      SELECT s.*, u.name, u.email, u.phone
+      SELECT s.*, u.name, u.email, u.phone, c.name as class_name
       FROM students s
       JOIN users u ON s.user_id = u.id
+      LEFT JOIN classes c ON s.class_id = c.id
       WHERE s.user_id = $1
     `;
     const { rows } = await query(sql, [userId]);
@@ -156,6 +160,20 @@ const StudentModel = {
       WHERE a.course_id = $1
     `;
     const { rows } = await query(sql, [courseId]);
+    return rows;
+  },
+
+  /**
+   * Get subjects assigned to a student
+   */
+  getAssignedSubjects: async (studentId) => {
+    const sql = `
+      SELECT s.id, s.name, s.code
+      FROM subjects s
+      JOIN student_subjects ss ON s.id = ss.subject_id
+      WHERE ss.student_id = $1
+    `;
+    const { rows } = await query(sql, [studentId]);
     return rows;
   },
 };

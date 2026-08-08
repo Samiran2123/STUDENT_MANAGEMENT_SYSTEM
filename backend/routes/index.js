@@ -10,6 +10,7 @@ const attendanceRoutes   = require('./attendance.routes');
 const marksRoutes        = require('./marks.routes');
 const feesRoutes         = require('./fees.routes');
 const announcementRoutes = require('./announcement.routes');
+const erpRoutes          = require('./erp.routes');
 
 // Mount all routes
 router.use('/auth',          authRoutes);
@@ -21,5 +22,6 @@ router.use('/attendance',    attendanceRoutes);
 router.use('/marks',         marksRoutes);
 router.use('/fees',          feesRoutes);
 router.use('/announcements', announcementRoutes);
+router.use('/erp',           erpRoutes);
 
 module.exports = router;

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useState, useEffect, useCallback } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { TOKEN_KEY, USER_KEY } from '../utils/constants';
@@ -82,16 +83,21 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const res = await authService.register(userData);
-      if (res.success && res.data?.token) {
-        const newToken = res.data.token;
-        const createdUser = res.data.user;
+      if (res.success) {
+        if (res.data?.token) {
+          const newToken = res.data.token;
+          const createdUser = res.data.user;
 
-        localStorage.setItem(TOKEN_KEY, newToken);
-        localStorage.setItem(USER_KEY, JSON.stringify(createdUser));
+          localStorage.setItem(TOKEN_KEY, newToken);
+          localStorage.setItem(USER_KEY, JSON.stringify(createdUser));
 
-        setToken(newToken);
-        setUser(createdUser);
-        return { success: true, user: createdUser };
+          setToken(newToken);
+          setUser(createdUser);
+          return { success: true, user: createdUser };
+        } else {
+          // Registration succeeded without auto-login token (e.g., student pending admission approval)
+          return { success: true, user: res.data?.user || null, message: res.message };
+        }
       } else {
         return { success: false, message: res.message || 'Registration failed' };
       }

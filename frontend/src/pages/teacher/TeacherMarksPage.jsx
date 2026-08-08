@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FiPlus, FiEdit, FiAward, FiFileText } from 'react-icons/fi';
+import React, { useState, useEffect, useCallback } from 'react';
+import { FiPlus, FiEdit } from 'react-icons/fi';
 import { marksService } from '../../services/marksService';
 import { studentService } from '../../services/studentService';
 import { courseService } from '../../services/courseService';
@@ -34,7 +34,7 @@ const TeacherMarksPage = () => {
     total_marks: 50,
   });
 
-  const fetchMarks = async () => {
+  const fetchMarks = useCallback(async () => {
     setLoading(true);
     try {
       const res = await marksService.getAll({
@@ -49,12 +49,12 @@ const TeacherMarksPage = () => {
           setTotalPages(res.pagination.totalPages || 1);
         }
       }
-    } catch (err) {
+    } catch {
       showToast.error('Failed to load marks');
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, selectedCourse, selectedExamType]);
 
   const fetchDependencies = async () => {
     try {
@@ -79,7 +79,7 @@ const TeacherMarksPage = () => {
 
   useEffect(() => {
     fetchMarks();
-  }, [page, selectedCourse, selectedExamType]);
+  }, [fetchMarks]);
 
   useEffect(() => {
     fetchDependencies();

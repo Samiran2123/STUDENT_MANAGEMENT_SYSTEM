@@ -1,0 +1,184 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "School ERP API",
+  "dateExported": "2024-01-01T00:00:00.000Z",
+  "version": "1.1",
+  "folders": [],
+  "requests": [
+    {
+      "containerId": "",
+      "sortNum": 10000,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "colId": "c1",
+      "name": "Admin Login",
+      "url": "http://localhost:5000/api/auth/login",
+      "method": "POST",
+      "modified": "2024-01-01T00:00:00.000Z",
+      "created": "2024-01-01T00:00:00.000Z",
+      "_id": "r1",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"admin@sms.edu\",\n  \"password\": \"Admin@123\"\n}"
+      },
+      "tests": [
+        {
+          "type": "res-body",
+          "custom": "data.token",
+          "action": "setenvvar",
+          "value": "token"
+        }
+      ]
+    },
+    {
+      "containerId": "",
+      "sortNum": 20000,
+      "headers": [],
+      "colId": "c1",
+      "name": "Get Classes",
+      "url": "http://localhost:5000/api/erp/classes",
+      "method": "GET",
+      "modified": "2024-01-01T00:00:00.000Z",
+      "created": "2024-01-01T00:00:00.000Z",
+      "_id": "r2",
+      "auth": {
+        "type": "bearer",
+        "bearer": "{{token}}"
+      }
+    },
+    {
+      "containerId": "",
+      "sortNum": 30000,
+      "headers": [],
+      "colId": "c1",
+      "name": "Get Academic Years",
+      "url": "http://localhost:5000/api/erp/academic-years",
+      "method": "GET",
+      "modified": "2024-01-01T00:00:00.000Z",
+      "created": "2024-01-01T00:00:00.000Z",
+      "_id": "r3",
+      "auth": {
+        "type": "bearer",
+        "bearer": "{{token}}"
+      }
+    },
+    {
+      "containerId": "",
+      "sortNum": 40000,
+      "headers": [],
+      "colId": "c1",
+      "name": "Get Pending Admissions",
+      "url": "http://localhost:5000/api/erp/pending-admissions",
+      "method": "GET",
+      "modified": "2024-01-01T00:00:00.000Z",
+      "created": "2024-01-01T00:00:00.000Z",
+      "_id": "r4",
+      "auth": {
+        "type": "bearer",
+        "bearer": "{{token}}"
+      }
+    },
+    {
+      "containerId": "",
+      "sortNum": 50000,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "colId": "c1",
+      "name": "Approve Admission",
+      "url": "http://localhost:5000/api/erp/admissions/1/approve",
+      "method": "PUT",
+      "modified": "2024-01-01T00:00:00.000Z",
+      "created": "2024-01-01T00:00:00.000Z",
+      "_id": "r5",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"class_id\": 1,\n  \"section_id\": 1\n}"
+      },
+      "auth": {
+        "type": "bearer",
+        "bearer": "{{token}}"
+      }
+    },
+    {
+      "containerId": "",
+      "sortNum": 60000,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "colId": "c1",
+      "name": "Reject Admission",
+      "url": "http://localhost:5000/api/erp/admissions/1/reject",
+      "method": "PUT",
+      "modified": "2024-01-01T00:00:00.000Z",
+      "created": "2024-01-01T00:00:00.000Z",
+      "_id": "r6",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"reason\": \"Incomplete documentation\"\n}"
+      },
+      "auth": {
+        "type": "bearer",
+        "bearer": "{{token}}"
+      }
+    },
+    {
+      "containerId": "",
+      "sortNum": 70000,
+      "headers": [],
+      "colId": "c1",
+      "name": "Get Student Details",
+      "url": "http://localhost:5000/api/students/1",
+      "method": "GET",
+      "modified": "2024-01-01T00:00:00.000Z",
+      "created": "2024-01-01T00:00:00.000Z",
+      "_id": "r7",
+      "auth": {
+        "type": "bearer",
+        "bearer": "{{token}}"
+      }
+    },
+    {
+      "containerId": "",
+      "sortNum": 80000,
+      "headers": [],
+      "colId": "c1",
+      "name": "Get Fee Structure",
+      "url": "http://localhost:5000/api/fees",
+      "method": "GET",
+      "modified": "2024-01-01T00:00:00.000Z",
+      "created": "2024-01-01T00:00:00.000Z",
+      "_id": "r8",
+      "auth": {
+        "type": "bearer",
+        "bearer": "{{token}}"
+      }
+    },
+    {
+      "containerId": "",
+      "sortNum": 90000,
+      "headers": [],
+      "colId": "c1",
+      "name": "Get Assigned Subjects",
+      "url": "http://localhost:5000/api/students/1/subjects",
+      "method": "GET",
+      "modified": "2024-01-01T00:00:00.000Z",
+      "created": "2024-01-01T00:00:00.000Z",
+      "_id": "r9",
+      "auth": {
+        "type": "bearer",
+        "bearer": "{{token}}"
+      }
+    }
+  ]
+}
