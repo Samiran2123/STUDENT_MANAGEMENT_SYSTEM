@@ -26,23 +26,38 @@ const StudentModel = {
   },
 
   /**
-   * Find all students with joined user info
+   * Find all students with joined user, class, section info
    */
-  findAll: async ({ department, semester, status, limit = 50, offset = 0 } = {}) => {
+  findAll: async ({ department, semester, status, class_id, section_id, degree, academic_year_id, search, limit = 50, offset = 0 } = {}) => {
     const params = [];
     const conditions = [];
     let idx = 1;
 
-    if (department) { conditions.push(`s.department = $${idx++}`); params.push(department); }
-    if (semester)   { conditions.push(`s.semester = $${idx++}`);   params.push(semester); }
-    if (status)     { conditions.push(`s.status = $${idx++}`);     params.push(status); }
+    if (department)       { conditions.push(`s.department = $${idx++}`);       params.push(department); }
+    if (semester)         { conditions.push(`s.semester = $${idx++}`);         params.push(semester); }
+    if (status)           { conditions.push(`s.status = $${idx++}`);           params.push(status); }
+    if (class_id)         { conditions.push(`s.class_id = $${idx++}`);         params.push(class_id); }
+    if (section_id)       { conditions.push(`s.section_id = $${idx++}`);       params.push(section_id); }
+    if (degree)           { conditions.push(`s.degree = $${idx++}`);           params.push(degree); }
+    if (academic_year_id) { conditions.push(`s.academic_year_id = $${idx++}`); params.push(academic_year_id); }
+    if (search) {
+      conditions.push(`(u.name ILIKE $${idx} OR s.roll_number ILIKE $${idx} OR s.student_code ILIKE $${idx})`);
+      params.push(`%${search}%`);
+      idx++;
+    }
 
     const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
     const sql = `
-      SELECT s.*, u.name, u.email, u.phone
+      SELECT s.*, u.name, u.email, u.phone,
+             c.name AS class_name,
+             sec.name AS section_name,
+             ay.year_name AS academic_year_name
       FROM students s
       JOIN users u ON s.user_id = u.id
+      LEFT JOIN classes c ON s.class_id = c.id
+      LEFT JOIN sections sec ON s.section_id = sec.id
+      LEFT JOIN academic_years ay ON s.academic_year_id = ay.id
       ${whereClause}
       ORDER BY s.id DESC
       LIMIT $${idx++} OFFSET $${idx++}
@@ -55,29 +70,49 @@ const StudentModel = {
   /**
    * Count students with optional filters
    */
-  count: async ({ department, semester, status } = {}) => {
+  count: async ({ department, semester, status, class_id, section_id, degree, academic_year_id, search } = {}) => {
     const params = [];
     const conditions = [];
     let idx = 1;
 
-    if (department) { conditions.push(`department = $${idx++}`); params.push(department); }
-    if (semester)   { conditions.push(`semester = $${idx++}`);   params.push(semester); }
-    if (status)     { conditions.push(`status = $${idx++}`);     params.push(status); }
+    if (department)       { conditions.push(`s.department = $${idx++}`);       params.push(department); }
+    if (semester)         { conditions.push(`s.semester = $${idx++}`);         params.push(semester); }
+    if (status)           { conditions.push(`s.status = $${idx++}`);           params.push(status); }
+    if (class_id)         { conditions.push(`s.class_id = $${idx++}`);         params.push(class_id); }
+    if (section_id)       { conditions.push(`s.section_id = $${idx++}`);       params.push(section_id); }
+    if (degree)           { conditions.push(`s.degree = $${idx++}`);           params.push(degree); }
+    if (academic_year_id) { conditions.push(`s.academic_year_id = $${idx++}`); params.push(academic_year_id); }
+    if (search) {
+      conditions.push(`(u.name ILIKE $${idx} OR s.roll_number ILIKE $${idx} OR s.student_code ILIKE $${idx})`);
+      params.push(`%${search}%`);
+      idx++;
+    }
 
     const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-    const sql = `SELECT COUNT(*) AS total FROM students ${whereClause}`;
+    const sql = `
+      SELECT COUNT(*) AS total 
+      FROM students s
+      JOIN users u ON s.user_id = u.id
+      ${whereClause}
+    `;
     const { rows } = await query(sql, params);
     return parseInt(rows[0].total, 10);
   },
 
   /**
-   * Find student by ID (with user info)
+   * Find student by ID (with user, class, section info)
    */
   findById: async (id) => {
     const sql = `
-      SELECT s.*, u.name, u.email, u.phone
+      SELECT s.*, u.name, u.email, u.phone,
+             c.name AS class_name,
+             sec.name AS section_name,
+             ay.year_name AS academic_year_name
       FROM students s
       JOIN users u ON s.user_id = u.id
+      LEFT JOIN classes c ON s.class_id = c.id
+      LEFT JOIN sections sec ON s.section_id = sec.id
+      LEFT JOIN academic_years ay ON s.academic_year_id = ay.id
       WHERE s.id = $1
     `;
     const { rows } = await query(sql, [id]);
@@ -89,10 +124,15 @@ const StudentModel = {
    */
   findByUserId: async (userId) => {
     const sql = `
-      SELECT s.*, u.name, u.email, u.phone, c.name as class_name
+      SELECT s.*, u.name, u.email, u.phone,
+             c.name AS class_name,
+             sec.name AS section_name,
+             ay.year_name AS academic_year_name
       FROM students s
       JOIN users u ON s.user_id = u.id
       LEFT JOIN classes c ON s.class_id = c.id
+      LEFT JOIN sections sec ON s.section_id = sec.id
+      LEFT JOIN academic_years ay ON s.academic_year_id = ay.id
       WHERE s.user_id = $1
     `;
     const { rows } = await query(sql, [userId]);
@@ -115,6 +155,7 @@ const StudentModel = {
     const allowed = [
       'roll_number', 'department', 'semester', 'year', 'gender',
       'dob', 'address', 'photo', 'guardian_name', 'guardian_phone', 'status',
+      'class_id', 'section_id', 'degree', 'academic_year_id', 'student_code'
     ];
     const setClauses = [];
     const params = [];
@@ -153,7 +194,7 @@ const StudentModel = {
    */
   findByCourse: async (courseId) => {
     const sql = `
-      SELECT DISTINCT s.*, u.name, u.email
+      SELECT DISTINCT s.*, u.name, u.email, s.roll_number, s.student_code
       FROM students s
       JOIN users u ON s.user_id = u.id
       JOIN attendance a ON a.student_id = s.id

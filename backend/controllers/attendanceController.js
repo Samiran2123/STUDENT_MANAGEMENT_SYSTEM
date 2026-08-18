@@ -3,6 +3,7 @@ const AttendanceModel = require('../models/attendanceModel');
 const TeacherModel = require('../models/teacherModel');
 const StudentModel = require('../models/studentModel');
 const CourseModel = require('../models/courseModel');
+const { generateStudentAttendancePDF } = require('../utils/pdfGenerator');
 const asyncHandler = require('../utils/asyncHandler');
 const { successResponse, errorResponse, createdResponse, noContentResponse } = require('../utils/apiResponse');
 
@@ -75,9 +76,17 @@ const bulkAttendance = asyncHandler(async (req, res) => {
  * All roles: View attendance with role-based filter
  */
 const getAllAttendance = asyncHandler(async (req, res) => {
-  const { student_id, course_id, date, status, page = 1, limit = 50 } = req.query;
+  const {
+    student_id, course_id, date, date_from, date_to,
+    class_id, section_id, status, search, page = 1, limit = 50
+  } = req.query;
   const offset = (parseInt(page) - 1) * parseInt(limit);
-  const filters = { date, status, limit: parseInt(limit), offset };
+  const filters = {
+    date, date_from, date_to,
+    class_id: class_id ? parseInt(class_id) : undefined,
+    section_id: section_id ? parseInt(section_id) : undefined,
+    status, search, limit: parseInt(limit), offset
+  };
 
   if (req.user.role === 'student') {
     // Students see only their own attendance
@@ -97,8 +106,17 @@ const getAllAttendance = asyncHandler(async (req, res) => {
     if (course_id)  filters.course_id  = parseInt(course_id);
   }
 
-  const records = await AttendanceModel.findAll(filters);
-  return successResponse(res, 200, 'Attendance fetched successfully.', records);
+  const [records, total] = await Promise.all([
+    AttendanceModel.findAll(filters),
+    AttendanceModel.count(filters),
+  ]);
+
+  return successResponse(res, 200, 'Attendance fetched successfully.', records, {
+    total,
+    page: parseInt(page),
+    limit: parseInt(limit),
+    totalPages: Math.ceil(total / parseInt(limit)) || 1,
+  });
 });
 
 /**
@@ -130,6 +148,42 @@ const getAttendanceSummary = asyncHandler(async (req, res) => {
 
   const summary = await AttendanceModel.getSummary(studentId, courseId);
   return successResponse(res, 200, 'Attendance summary fetched.', summary);
+});
+
+/**
+ * GET /api/attendance/student/:id/pdf
+ * Generate one-click attendance report PDF from PostgreSQL database
+ */
+const generateAttendancePDF = asyncHandler(async (req, res) => {
+  const studentId = parseInt(req.params.id);
+  if (!studentId || isNaN(studentId)) {
+    return errorResponse(res, 400, 'Invalid student ID.');
+  }
+
+  // Security check
+  if (req.user.role === 'student') {
+    const studentProfile = await StudentModel.findByUserId(req.user.id);
+    if (!studentProfile || studentProfile.id !== studentId) {
+      return errorResponse(res, 403, 'You are only authorized to download your own attendance report.');
+    }
+  }
+
+  // Fetch full student profile
+  const student = await StudentModel.findById(studentId);
+  if (!student) {
+    return errorResponse(res, 404, `Student with ID ${studentId} not found.`);
+  }
+
+  // Fetch attendance analytics
+  const report = await AttendanceModel.getStudentFullReport(studentId);
+
+  // Set streaming PDF headers
+  const sanitizedRoll = (student.roll_number || `STU${student.id}`).replace(/[^a-zA-Z0-9_-]/g, '_');
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `inline; filename="attendance_report_${sanitizedRoll}.pdf"`);
+
+  // Stream PDF response
+  generateStudentAttendancePDF(student, report.summary, report.courses, res);
 });
 
 /**
@@ -167,6 +221,7 @@ module.exports = {
   getAllAttendance,
   getAttendanceById,
   getAttendanceSummary,
+  generateAttendancePDF,
   updateAttendance,
   deleteAttendance,
 };

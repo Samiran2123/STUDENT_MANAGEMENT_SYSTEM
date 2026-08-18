@@ -35,4 +35,28 @@ export const attendanceService = {
     const response = await api.delete(`/attendance/${id}`);
     return response.data;
   },
+
+  getStudentReport: async (studentId) => {
+    // Fetch all records for this specific student to build the preview
+    const response = await api.get('/attendance', {
+      params: { student_id: studentId, limit: 500 },
+    });
+    return response.data;
+  },
+
+  downloadStudentAttendancePDF: async (studentId, filename) => {
+    const response = await api.get(`/attendance/student/${studentId}/pdf`, {
+      responseType: 'blob',
+    });
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename || `attendance_report_${studentId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    return { success: true };
+  },
 };

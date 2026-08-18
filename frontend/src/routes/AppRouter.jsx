@@ -22,7 +22,7 @@ import TeachersPage from '../pages/admin/TeachersPage';
 import CoursesPage from '../pages/admin/CoursesPage';
 import AttendancePage from '../pages/admin/AttendancePage';
 import MarksPage from '../pages/admin/MarksPage';
-import FeesPage from '../pages/admin/FeesPage';
+import AdminFinancePage from '../pages/admin/AdminFinancePage';
 import AnnouncementsPage from '../pages/admin/AnnouncementsPage';
 import UsersPage from '../pages/admin/UsersPage';
 import AdminAdmissionsPage from '../pages/admin/AdminAdmissionsPage';
@@ -31,8 +31,6 @@ import AdminSectionsPage from '../pages/admin/AdminSectionsPage';
 import AdminSubjectsPage from '../pages/admin/AdminSubjectsPage';
 import AdminAcademicYearsPage from '../pages/admin/AdminAcademicYearsPage';
 import AdminFeeStructuresPage from '../pages/admin/AdminFeeStructuresPage';
-import AdminFeeLedgerPage from '../pages/admin/AdminFeeLedgerPage';
-import AdminPaymentsPage from '../pages/admin/AdminPaymentsPage';
 
 // Teacher Sub-Pages
 import TeacherDashboard from '../pages/teacher/TeacherDashboard';
@@ -84,19 +82,20 @@ const AppRouter = () => {
           <Route path="courses" element={<CoursesPage />} />
           <Route path="attendance" element={<AttendancePage />} />
           <Route path="marks" element={<MarksPage />} />
-          <Route path="fees" element={<FeesPage />} />
+          <Route path="finance" element={<AdminFinancePage />} />
+          <Route path="fees" element={<Navigate to="/admin/finance?tab=fees" replace />} />
+          <Route path="payments" element={<Navigate to="/admin/finance?tab=payments" replace />} />
+          <Route path="fee-ledger" element={<Navigate to="/admin/finance?tab=fees" replace />} />
           <Route path="announcements" element={<AnnouncementsPage />} />
           <Route path="users" element={<UsersPage />} />
           
-          {/* New ERP Modules */}
+          {/* ERP Modules */}
           <Route path="admissions" element={<AdminAdmissionsPage />} />
           <Route path="classes" element={<AdminClassesPage />} />
           <Route path="sections" element={<AdminSectionsPage />} />
           <Route path="subjects" element={<AdminSubjectsPage />} />
           <Route path="academic-years" element={<AdminAcademicYearsPage />} />
           <Route path="fee-structures" element={<AdminFeeStructuresPage />} />
-          <Route path="fee-ledger" element={<AdminFeeLedgerPage />} />
-          <Route path="payments" element={<AdminPaymentsPage />} />
         </Route>
       </Route>
 

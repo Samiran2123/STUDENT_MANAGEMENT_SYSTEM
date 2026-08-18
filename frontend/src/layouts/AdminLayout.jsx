@@ -17,9 +17,21 @@ const AdminLayout = () => {
     { path: '/admin/students', label: 'Students', icon: <FiUsers /> },
     { path: '/admin/teachers', label: 'Teachers', icon: <FiUserCheck /> },
     { path: '/admin/courses', label: 'Courses', icon: <FiBookOpen /> },
-    { path: '/admin/attendance', label: 'Attendance', icon: <FiCheckSquare /> },
-    { path: '/admin/marks', label: 'Marks & Grading', icon: <FiAward /> },
-    { path: '/admin/fees', label: 'Fee Management', icon: <FiDollarSign /> },
+    {
+      label: 'Academic',
+      icon: <FiAward />,
+      children: [
+        { path: '/admin/attendance', label: 'Attendance', icon: <FiCheckSquare /> },
+        { path: '/admin/marks', label: 'Marks & Grading', icon: <FiAward /> },
+      ],
+    },
+    {
+      label: 'Finance',
+      icon: <FiDollarSign />,
+      children: [
+        { path: '/admin/finance', label: 'Fees & Payments', icon: <FiDollarSign /> },
+      ],
+    },
     { path: '/admin/announcements', label: 'Announcements', icon: <FiVolume2 /> },
     { path: '/admin/users', label: 'User Accounts', icon: <FiShield /> },
     { path: '/admin/admissions', label: 'Admissions (ERP)', icon: <FiFilePlus /> },
@@ -28,8 +40,6 @@ const AdminLayout = () => {
     { path: '/admin/subjects', label: 'Subjects (ERP)', icon: <FiBookOpen /> },
     { path: '/admin/academic-years', label: 'Academic Years', icon: <FiClock /> },
     { path: '/admin/fee-structures', label: 'Fee Structures', icon: <FiBriefcase /> },
-    { path: '/admin/fee-ledger', label: 'Student Ledger', icon: <FiFileText /> },
-    { path: '/admin/payments', label: 'Payments', icon: <FiDollarSign /> },
     { path: '/profile', label: 'My Profile', icon: <FiUser /> },
   ];
 

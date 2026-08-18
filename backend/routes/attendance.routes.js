@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const {
   takeAttendance, bulkAttendance, getAllAttendance,
-  getAttendanceById, getAttendanceSummary, updateAttendance, deleteAttendance,
+  getAttendanceById, getAttendanceSummary, generateAttendancePDF,
+  updateAttendance, deleteAttendance,
 } = require('../controllers/attendanceController');
 const { verifyToken } = require('../middleware/auth');
 const { authorize } = require('../middleware/authorize');
@@ -32,6 +33,13 @@ router.post('/bulk', verifyToken, authorize('admin', 'teacher'), bulkAttendanceV
  * @query   student_id, course_id, date, status, page, limit
  */
 router.get('/', verifyToken, authorize('admin', 'teacher', 'student'), getAllAttendance);
+
+/**
+ * @route   GET /api/attendance/student/:id/pdf
+ * @desc    Generate attendance PDF report
+ * @access  Admin, Teacher, Student (own only)
+ */
+router.get('/student/:id/pdf', verifyToken, authorize('admin', 'teacher', 'student'), generateAttendancePDF);
 
 /**
  * @route   GET /api/attendance/summary/:studentId/:courseId

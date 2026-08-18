@@ -40,7 +40,7 @@ const AttendanceModel = {
   /**
    * Get all attendance records with filters
    */
-  findAll: async ({ student_id, course_id, teacher_id, date, status, limit = 100, offset = 0 } = {}) => {
+  findAll: async ({ student_id, course_id, teacher_id, date, date_from, date_to, class_id, section_id, status, search, limit = 100, offset = 0 } = {}) => {
     const params = [];
     const conditions = [];
     let idx = 1;
@@ -49,7 +49,16 @@ const AttendanceModel = {
     if (course_id)   { conditions.push(`a.course_id = $${idx++}`);   params.push(course_id); }
     if (teacher_id)  { conditions.push(`a.teacher_id = $${idx++}`);  params.push(teacher_id); }
     if (date)        { conditions.push(`a.date = $${idx++}`);        params.push(date); }
+    if (date_from)   { conditions.push(`a.date >= $${idx++}`);       params.push(date_from); }
+    if (date_to)     { conditions.push(`a.date <= $${idx++}`);       params.push(date_to); }
+    if (class_id)    { conditions.push(`s.class_id = $${idx++}`);    params.push(class_id); }
+    if (section_id)  { conditions.push(`s.section_id = $${idx++}`);  params.push(section_id); }
     if (status)      { conditions.push(`a.status = $${idx++}`);      params.push(status); }
+    if (search) {
+      conditions.push(`(u.name ILIKE $${idx} OR s.roll_number ILIKE $${idx} OR c.course_name ILIKE $${idx} OR c.course_code ILIKE $${idx})`);
+      params.push(`%${search}%`);
+      idx++;
+    }
 
     const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
@@ -58,12 +67,19 @@ const AttendanceModel = {
         a.*,
         u.name AS student_name,
         s.roll_number,
+        s.student_code,
+        s.class_id,
+        s.section_id,
+        cls.name AS class_name,
+        sec.name AS section_name,
         c.course_name,
         c.course_code
       FROM attendance a
       JOIN students s ON a.student_id = s.id
       JOIN users u ON s.user_id = u.id
       JOIN courses c ON a.course_id = c.id
+      LEFT JOIN classes cls ON s.class_id = cls.id
+      LEFT JOIN sections sec ON s.section_id = sec.id
       ${whereClause}
       ORDER BY a.date DESC, a.id DESC
       LIMIT $${idx++} OFFSET $${idx++}
@@ -71,6 +87,42 @@ const AttendanceModel = {
     params.push(limit, offset);
     const { rows } = await query(sql, params);
     return rows;
+  },
+
+  /**
+   * Count attendance records with filters
+   */
+  count: async ({ student_id, course_id, teacher_id, date, date_from, date_to, class_id, section_id, status, search } = {}) => {
+    const params = [];
+    const conditions = [];
+    let idx = 1;
+
+    if (student_id)  { conditions.push(`a.student_id = $${idx++}`);  params.push(student_id); }
+    if (course_id)   { conditions.push(`a.course_id = $${idx++}`);   params.push(course_id); }
+    if (teacher_id)  { conditions.push(`a.teacher_id = $${idx++}`);  params.push(teacher_id); }
+    if (date)        { conditions.push(`a.date = $${idx++}`);        params.push(date); }
+    if (date_from)   { conditions.push(`a.date >= $${idx++}`);       params.push(date_from); }
+    if (date_to)     { conditions.push(`a.date <= $${idx++}`);       params.push(date_to); }
+    if (class_id)    { conditions.push(`s.class_id = $${idx++}`);    params.push(class_id); }
+    if (section_id)  { conditions.push(`s.section_id = $${idx++}`);  params.push(section_id); }
+    if (status)      { conditions.push(`a.status = $${idx++}`);      params.push(status); }
+    if (search) {
+      conditions.push(`(u.name ILIKE $${idx} OR s.roll_number ILIKE $${idx} OR c.course_name ILIKE $${idx} OR c.course_code ILIKE $${idx})`);
+      params.push(`%${search}%`);
+      idx++;
+    }
+
+    const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+    const sql = `
+      SELECT COUNT(*) AS total
+      FROM attendance a
+      JOIN students s ON a.student_id = s.id
+      JOIN users u ON s.user_id = u.id
+      JOIN courses c ON a.course_id = c.id
+      ${whereClause}
+    `;
+    const { rows } = await query(sql, params);
+    return parseInt(rows[0].total, 10);
   },
 
   /**
@@ -121,6 +173,57 @@ const AttendanceModel = {
     `;
     const { rows } = await query(sql, [studentId, courseId]);
     return rows[0];
+  },
+
+  /**
+   * Get full student attendance analytics (overall + course breakdown)
+   */
+  getStudentFullReport: async (studentId) => {
+    // 1. Overall Summary
+    const summarySql = `
+      SELECT
+        COUNT(*) AS total_classes,
+        COUNT(*) FILTER (WHERE status = 'present') AS present,
+        COUNT(*) FILTER (WHERE status = 'absent')  AS absent,
+        COUNT(*) FILTER (WHERE status = 'late')    AS late,
+        COUNT(*) FILTER (WHERE status = 'excused') AS excused,
+        COALESCE(ROUND(
+          COUNT(*) FILTER (WHERE status IN ('present','late')) * 100.0 / NULLIF(COUNT(*), 0), 1
+        ), 0) AS attendance_percentage
+      FROM attendance
+      WHERE student_id = $1
+    `;
+    const summaryRes = await query(summarySql, [studentId]);
+    const summary = summaryRes.rows[0] || {
+      total_classes: 0, present: 0, absent: 0, late: 0, excused: 0, attendance_percentage: 0
+    };
+
+    // 2. Course-wise Breakdown
+    const coursesSql = `
+      SELECT
+        c.id AS course_id,
+        c.course_name,
+        c.course_code,
+        COUNT(a.id) AS total,
+        COUNT(a.id) FILTER (WHERE a.status = 'present') AS present,
+        COUNT(a.id) FILTER (WHERE a.status = 'absent')  AS absent,
+        COUNT(a.id) FILTER (WHERE a.status = 'late')    AS late,
+        COUNT(a.id) FILTER (WHERE a.status = 'excused') AS excused,
+        COALESCE(ROUND(
+          COUNT(a.id) FILTER (WHERE a.status IN ('present','late')) * 100.0 / NULLIF(COUNT(a.id), 0), 1
+        ), 0) AS percentage
+      FROM attendance a
+      JOIN courses c ON a.course_id = c.id
+      WHERE a.student_id = $1
+      GROUP BY c.id, c.course_name, c.course_code
+      ORDER BY c.course_name ASC
+    `;
+    const coursesRes = await query(coursesSql, [studentId]);
+
+    return {
+      summary,
+      courses: coursesRes.rows,
+    };
   },
 
   /**
